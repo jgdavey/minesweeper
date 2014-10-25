@@ -1,0 +1,52 @@
+%h1 Minesweeper
+
+- height = rand(10..23)
+- width = rand(10..23)
+
+%form#settings
+  %select(name="presets")
+    %option() Beginner
+    %option() Intermediate
+    %option() Expert
+    %option() Custom
+  %dl
+    %dt
+      %label(for="width") Width
+    %dd
+      %input(type="text" name="width" value=width maxlength="3")
+    %dt
+      %label(for="width") Height
+    %dd
+      %input(type="text" name="height" value=height maxlength="3")
+    %dt
+      %label(for="width") Bombs
+    %dd
+      %input(type="text" name="bombs" value="12" maxlength="3")
+
+#app
+  #score
+    %span.remaining
+      08
+    %span.moves
+      16
+    %span.face
+  #board
+    - height.times do
+      .row
+        - width.times do
+          - if rand(10) < 3
+            .space.depressed
+              - if [true, false, false].sample
+                %span= rand(1..3)
+          - elsif rand(10) < 2
+            .space.bomb.exploded.depressed
+              %span
+          - elsif rand(10) < 3
+            .space.flagged
+              %span
+          - elsif rand(10) < 2
+            .space.depressed.bomb
+              %span
+          - else
+            .space.normal
+              %span

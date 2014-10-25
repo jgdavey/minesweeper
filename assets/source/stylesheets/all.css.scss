@@ -1,0 +1,163 @@
+@charset "utf-8";
+
+body {
+  background: #fafafa url("../images/background.png");
+  font-family: sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: rgba(0, 0, 0, .3);
+  font-weight: bold;
+  font-size: 32px;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+  margin-top: 20px;
+}
+
+$shadow: #aaa;
+$light: #eee;
+$score-height: 25px;
+
+.inset {
+  border: 2px solid $shadow;
+  border-right-color: $light;
+  border-bottom-color: $light;
+}
+
+.outset {
+  border: 2px solid $light;
+  border-right-color: $shadow;
+  border-bottom-color: $shadow;
+}
+
+.borderless {
+  border: 2px solid transparent;
+}
+
+#content {
+  text-align: center;
+  overflow: hidden;
+}
+
+#settings {
+  width: 200px;
+  margin: 0 auto 10px;
+  font-size: 12px;
+  dl {
+    text-align: left;
+  }
+  dt, dd {
+    line-height: 20px;
+  }
+  dt {
+    text-align: right;
+    width: 100px;
+    clear: left;
+    float: left;
+    margin-right: 5px;
+  }
+  input {
+    width: 26px;
+  }
+  select {
+    width: 100px;
+  }
+}
+
+#app {
+  background-color: #ccc;
+  display: inline-block;
+  padding: 6px;
+  @extend .outset;
+  overflow: hidden;
+
+  #score {
+    @extend .inset;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #666;
+    height: $score-height;
+
+    .remaining, .moves {
+      font-size: 16px;
+      line-height: 18px;
+      display: inline-block;
+      padding: 5px 5px 2px;
+      font-family: Orbitron, monospace;
+      background-color: black;
+      color: #3e0;
+    }
+    .remaining {
+      float: left;
+    }
+    .moves {
+      float: right;
+    }
+
+    .face {
+      @extend .outset;
+      display: block;
+      margin: 2px auto 0;
+      height: $score-height - 8px;
+      width:  $score-height - 8px;
+      background: url("/images/sprite.png") no-repeat 0 0;
+
+      &.lost {
+        background-position: -38px 0;
+      }
+      &.won {
+        background-position: -19px 0;
+      }
+    }
+  }
+}
+
+#board {
+  overflow: hidden;
+  float: left;
+  @extend .inset;
+
+  .row {
+    clear: left;
+
+    .space {
+      box-sizing: border-box;
+      background-color: #ccc;
+      height: 18px;
+      width: 18px;
+      line-height: 14px;
+      float: left;
+      text-align: center;
+      font-size: 15px;
+      &.normal, &.flagged {
+        @extend .outset; // 2px border
+      }
+      &.flagged span, &.bomb span {
+        background-image: url("/images/sprite.png");
+        background-repeat: no-repeat;
+        display: block;
+        height: 13px;
+        width: 14px;
+      }
+      &.flagged span {
+        background-position: 0px -19px;
+      }
+      &.bomb span {
+        background-position: -14px -19px;
+      }
+      &.bomb.exploded {
+        background-color: red;
+      }
+      &.wrong.bomb span {
+        background-position: -30px -19px;
+      }
+      &.depressed {
+        padding: 1px 2px 2px 1px;
+        border: 1px solid #bbb;
+        border-width: 1px 0 0 1px;
+      }
+    }
+  }
+}

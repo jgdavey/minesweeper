@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd "$(dirname $0)"
+PATH="./bin:$PATH" middleman build
+
+rsync -auv --include="*.html" --exclude="*" _build/ ../resources/public
+
+for dir in stylesheets images; do
+  rsync -auv --delete _build/$dir/ ../resources/public/$dir
+done
