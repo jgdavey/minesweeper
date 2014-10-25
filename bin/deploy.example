@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+export GOOGLE_ANALYICS_CODE="YOUR CODE HERE"
+
+# Remove current JS
+rm -rf resources/public/js/
+
+# Rebuild static assets
+assets/build
+
+# Build JS
+lein with-profile uberjar cljsbuild once
+
+# Copy to server
+rsync -auvz --exclude '*/out/*' resources/public/ YOURSERVER:/path/to/staic/site
