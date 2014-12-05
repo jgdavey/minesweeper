@@ -8,15 +8,15 @@
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2371" :scope "provided"]
-                 [org.clojure/test.check  "0.5.9"]
-                 [ring "1.3.1"]
-                 [compojure "1.2.0"]
+                 [org.clojure/test.check  "0.6.1"]
+                 [ring "1.3.2"]
+                 [compojure "1.3.1"]
                  [enlive "1.1.5"]
                  [om "0.7.3"]
                  [figwheel "0.1.4-SNAPSHOT"]
                  [environ "1.0.0"]
                  [com.cemerick/piggieback "0.1.3"]
-                 [weasel "0.4.1"]
+                 [weasel "0.4.2"]
                  [leiningen "2.5.0"]
                  [http-kit "2.1.19"]]
 
@@ -40,7 +40,8 @@
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
                                                      cljx.repl-middleware/wrap-cljx]}
                    :plugins [[lein-figwheel "0.1.4-SNAPSHOT"]
-                             [com.keminglabs/cljx "0.4.0" :exclusions [org.clojure/clojure]]]
+                             [org.clojars.trptcolin/sjacket  "0.1.0.6" :exclusions  [org.clojure/clojure]]
+                             [com.keminglabs/cljx "0.4.0" :exclusions [org.clojars.trptcolin/sjacket org.clojure/clojure]]]
                    :figwheel {:http-server-root "public"
                               :port 3449
                               :css-dirs ["resources/public/css"]}
