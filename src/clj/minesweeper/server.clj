@@ -1,6 +1,6 @@
 (ns minesweeper.server
   (:require [clojure.java.io :as io]
-            [minesweeper.dev :refer [is-dev? inject-devmode-html browser-repl start-figwheel start-cljx]]
+            [minesweeper.dev :as dev :refer [is-dev? inject-devmode-html]]
             [compojure.core :refer [GET defroutes]]
             [compojure.route :refer [resources]]
             [compojure.handler :refer [api]]
@@ -57,7 +57,7 @@
   (resources "/react" {:root "react"})
   (GET "/" req (page))
   (GET "/index.html" req (page))
-  (proxy-response "http://localhost:4568"))
+  (proxy-response (str "http://localhost:" (or (env :middleman-port) 4567))))
 
 (def http-handler
   (if is-dev?
@@ -68,8 +68,9 @@
   (defonce ^:private server
     (do
       (when is-dev?
-        (start-figwheel)
-        (start-cljx))
+        (dev/start-figwheel)
+        (dev/start-cljx)
+        (dev/start-middleman (or (env :middleman-port) 4567)))
       (let [port (Integer. (or port (env :port) 10555))]
         (print "Starting web server on port" port ".\n")
         (run-server http-handler {:port port :join? false}))))

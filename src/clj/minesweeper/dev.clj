@@ -17,6 +17,13 @@
 (defn browser-repl []
   (piggieback/cljs-repl :repl-env (weasel.repl.websocket/repl-env :ip "0.0.0.0" :port 9001)))
 
+(defn start-middleman [port]
+  (let [dir (clojure.java.io/file "assets")
+        builder (ProcessBuilder. (into-array String (list "middleman" "-p" (str port))))]
+    (.directory builder dir)
+    (let [process (.start builder)]
+      (.addShutdownHook (Runtime/getRuntime) (Thread. (fn [] (.destroy process)))))))
+
 (defn start-figwheel []
   (future
     (print "Starting figwheel.\n")
