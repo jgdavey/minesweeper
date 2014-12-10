@@ -4,7 +4,8 @@
               [cljs.core.async :as async :refer [put! <! >! chan timeout]]
               [om.core :as om :include-macros true]
               [om.dom :as dom :include-macros true]
-              [minesweeper.core :as mine :refer [generate-board]])
+              [minesweeper.core :as mine :refer [generate-board]]
+              [minesweeper.score :as score])
     (:import [goog.string format]))
 
 (defonce default-level :beginner)
@@ -19,6 +20,10 @@
   (atom {:settings (choose-setting {} default-level)
          :game {:won? nil :lost? nil :board []}}))
 
+(defn high-scores []
+  (let [db (score/load-db)
+        format-entry (fn [[k v]] (format "%-12s\t%-4d\t%s" (name k) (:time v) (:name v)))]
+    (apply str (interpose "\n\n" (map format-entry db)))))
 
 (defn reset-game [_]
   (let [{:keys [width height bombs]} (:settings @app-state)]
@@ -39,12 +44,20 @@
               (recur)))))
     kill))
 
+(defonce win-chan (chan 1))
+
+(defn get-name []
+  (js/prompt "Congratulations!\n\nYou have achieved a new high score. What is your name?"))
+
 (defn start-game []
   (when-let [timer (get-in @app-state [:game :timer])]
     (put! timer :done))
   (let [timer (game-timer)]
     (swap! app-state update-in [:game] reset-game)
-    (swap! app-state assoc-in [:game :timer] timer)))
+    (swap! app-state assoc-in [:game :timer] timer))
+  (go (when-let [winner (<! win-chan)]
+        (when (score/new-high-score? (:level winner) (:time winner))
+          (score/save-score (:level winner) (get-name) (:time winner))))))
 
 
 (when-not (seq (get-in @app-state [:game :board]))
@@ -143,7 +156,10 @@
         (om/build settings-view (:settings app))
         (dom/div #js {:id "app"}
           (om/build score-view (:game app))
-          (om/build board-view (get-in app [:game :board])))))))
+          (om/build board-view (get-in app [:game :board])))
+        (dom/p nil
+          (dom/a #js {:href "#"
+                      :onClick (fn [e] (js/alert (high-scores)))} "High Scores"))))))
 
 
 (defn update-board-tx [tx-data root-cursor]
@@ -153,6 +169,7 @@
 
       (when (mine/won? (get-in @root-cursor [:game :board]))
         (when-let [timer (get-in @root-cursor [:game :timer])]
+          (put! win-chan {:level (get-in @root-cursor [:settings :level]) :time (get-in @root-cursor [:game :time])})
           (put! timer :done))
         (om/transact! root-cursor [:game] (fn [g] (assoc g :won? true))))
 
@@ -180,7 +197,7 @@
 (comment
 
 (:settings @app-state)
-(get-in @app-state [:game :lost?])
+(get-in @app-state [:settings])
 (get-in @app-state [:game :won?])
 
 )
