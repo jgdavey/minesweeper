@@ -27,12 +27,15 @@
      :time 0
      :board (generate-board width height bombs)}))
 
+(def seconds-difference (comp #(/ % 1000) -))
+
 (defn game-timer []
-  (let [kill (chan 1)]
+  (let [then (js/Date.)
+        kill (chan 1)]
     (go (loop []
           (let [[v c] (alts! [kill (timeout 1000)])]
             (when-not (identical? c kill)
-              (swap! app-state update-in [:game :time] inc)
+              (swap! app-state assoc-in [:game :time] (seconds-difference (js/Date.) then))
               (recur)))))
     kill))
 
@@ -43,8 +46,9 @@
     (swap! app-state update-in [:game] reset-game)
     (swap! app-state assoc-in [:game :timer] timer)))
 
-(start-game)
 
+(when-not (seq (get-in @app-state [:game :board]))
+  (start-game))
 
 ;; Om components
 
