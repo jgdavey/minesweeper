@@ -5,6 +5,11 @@ body {
   font-family: sans-serif;
 }
 
+p {
+  margin: 0 auto;
+  width: 200px;
+}
+
 h1 {
   text-align: center;
   color: rgba(0, 0, 0, .3);
@@ -111,6 +116,12 @@ $score-height: 25px;
         background-position: -19px 0;
       }
     }
+  }
+}
+
+@media screen and (max-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+  #content {
+    max-width: 320px;
   }
 }
 

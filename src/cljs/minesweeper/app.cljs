@@ -8,6 +8,8 @@
               [minesweeper.score :as score])
     (:import [goog.string format]))
 
+(.initializeTouchEvents js/React true)
+
 (defonce default-level :beginner)
 
 (defn choose-setting [settings level]
@@ -71,25 +73,28 @@
    (str count)))
 
 (defn space-view [{:keys [bomb? revealed? flagged? exploded? count] :as space} owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:className (str (cond
-                                      (and revealed? bomb? exploded?) "exploded depressed bomb"
-                                      (and revealed? flagged? (not bomb?)) "wrong depressed bomb"
-                                      (and revealed? bomb?) "depressed bomb"
-                                      revealed? "depressed"
-                                      flagged? "flagged"
-                                      :else "normal") " space")
-                    :onContextMenu (fn [e]
-                                     (.preventDefault e)
-                                     (when-not revealed?
-                                       (om/update! space :flagged? (not flagged?) :play)))
-                    :onClick (fn [e]
-                               (.preventDefault e)
-                               (when-not flagged?
-                                 (om/update! space :revealed? true :play)))}
-               (dom/span nil (button-label space))))))
+  (let [reveal (fn [e]
+                 (.preventDefault e)
+                 (when-not flagged?
+                   (om/update! space :revealed? true :play)))
+        flag (fn [e]
+               (.preventDefault e)
+               (when-not revealed?
+                 (om/update! space :flagged? (not flagged?) :play)))]
+    (reify
+      om/IRender
+      (render [_]
+        (dom/div #js {:className (str (cond
+                                        (and revealed? bomb? exploded?) "exploded depressed bomb"
+                                        (and revealed? flagged? (not bomb?)) "wrong depressed bomb"
+                                        (and revealed? bomb?) "depressed bomb"
+                                        revealed? "depressed"
+                                        flagged? "flagged"
+                                        :else "normal") " space")
+                      :onContextMenu flag
+                      :onTouchStart reveal
+                      :onClick reveal}
+                 (dom/span nil (button-label space)))))))
 
 (defn row-view [row owner]
   (reify
@@ -108,58 +113,58 @@
 (defn setting-field [settings name]
   (let [attr (keyword name)]
     [(dom/dt nil
-       (dom/label #js {:htmlFor name} name))
+             (dom/label #js {:htmlFor name} name))
      (dom/dd nil
-       (dom/input #js {:onChange (fn [e]
-                                   (om/update! settings attr (int (.. e -target -value))))
-                       :id name :name name :defaultValue (settings attr)}))]))
+             (dom/input #js {:onChange (fn [e]
+                                         (om/update! settings attr (int (.. e -target -value))))
+                             :id name :name name :defaultValue (settings attr)}))]))
 
 (defn settings-view [settings owner]
   (reify
     om/IRender
     (render [_]
       (dom/form #js {:id "settings"}
-        (dom/select #js {:value (name (:level settings))
-                         :onChange (fn [e]
-                                     (let [level (keyword (.. e -target -value))]
-                                       (om/transact! settings (fn [s] (choose-setting s level)))))}
-          (dom/option #js {:value "beginner"} "Beginner")
-          (dom/option #js {:value "intermediate"} "Intermediate")
-          (dom/option #js {:value "expert"} "Expert")
-          (dom/option #js {:value "custom"} "Custom"))
-        (when (= :custom (:level settings))
-          (apply dom/dl nil (mapcat (partial setting-field settings)
-                                    ["width" "height" "bombs"])))))))
+                (dom/select #js {:value (name (:level settings))
+                                 :onChange (fn [e]
+                                             (let [level (keyword (.. e -target -value))]
+                                               (om/transact! settings (fn [s] (choose-setting s level)))))}
+                            (dom/option #js {:value "beginner"} "Beginner")
+                            (dom/option #js {:value "intermediate"} "Intermediate")
+                            (dom/option #js {:value "expert"} "Expert")
+                            (dom/option #js {:value "custom"} "Custom"))
+                (when (= :custom (:level settings))
+                  (apply dom/dl nil (mapcat (partial setting-field settings)
+                                            ["width" "height" "bombs"])))))))
 
 (defn score-view [state owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:id "score"}
-        (dom/span #js {:className "remaining"}
-          (format "%03d" (mine/remaining-count (:board state))))
-        (dom/span #js {:className "moves"}
-          (format "%03d" (:time state)))
-        (dom/span
-          #js {:className (str (cond
-                                 (:lost? state) "lost"
-                                 (:won? state)  "won"
-                                 :else "normal") " face")
-               :onClick (fn [e] (start-game))} nil)))))
+               (dom/span #js {:className "remaining"}
+                         (format "%03d" (mine/remaining-count (:board state))))
+               (dom/span #js {:className "moves"}
+                         (format "%03d" (:time state)))
+               (dom/span
+                 #js {:className (str (cond
+                                        (:lost? state) "lost"
+                                        (:won? state)  "won"
+                                        :else "normal") " face")
+                      :onClick (fn [e] (start-game))} nil)))))
 
 (defn app-view [app owner]
   (reify
     om/IRender
     (render [_]
       (dom/div nil
-        (dom/h1 nil "Minesweeper")
-        (om/build settings-view (:settings app))
-        (dom/div #js {:id "app"}
-          (om/build score-view (:game app))
-          (om/build board-view (get-in app [:game :board])))
-        (dom/p nil
-          (dom/a #js {:href "#"
-                      :onClick (fn [e] (js/alert (high-scores)))} "High Scores"))))))
+               (dom/h1 nil "Minesweeper")
+               (om/build settings-view (:settings app))
+               (dom/div #js {:id "app"}
+                        (om/build score-view (:game app))
+                        (om/build board-view (get-in app [:game :board])))
+               (dom/p nil
+                      (dom/a #js {:href "#"
+                                  :onClick (fn [e] (js/alert (high-scores)))} "High Scores"))))))
 
 
 (defn update-board-tx [tx-data root-cursor]
@@ -196,8 +201,8 @@
 
 (comment
 
-(:settings @app-state)
-(get-in @app-state [:settings])
-(get-in @app-state [:game :won?])
+  (:settings @app-state)
+  (get-in @app-state [:settings])
+  (get-in @app-state [:game :won?])
 
-)
+  )

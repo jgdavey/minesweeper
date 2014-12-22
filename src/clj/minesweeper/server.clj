@@ -16,7 +16,7 @@
            [java.io FileNotFoundException]))
 
 (deftemplate page
-  (io/resource "index.html") [] [:body] (if is-dev? inject-devmode-html identity))
+  (io/resource "public/index.html") [] [:body] (if is-dev? inject-devmode-html identity))
 
 (defn- request-path
   "Return the path + query of the request."
