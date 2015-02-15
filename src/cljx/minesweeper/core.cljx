@@ -1,5 +1,6 @@
 (ns minesweeper.core
-  (:require [clojure.set :as set]))
+  (:require [clojure.set :as set]
+            [clojure.string :as str]))
 
 ;                           w  h  b
 (def levels {:beginner     [9  9  10]
@@ -98,7 +99,7 @@
                             s)) row)) board))
 
 (defn print-board [board]
-  (clojure.string/join "\n" (map #(apply str (map space->str %)) board)))
+  (str/join "\n" (map #(apply str (map space->str %)) board)))
 
 (defn reveal-coords [board coords]
   (let [propogated (propogated-coordinates board coords)]
