@@ -1,7 +1,7 @@
 (set-env!
  :source-paths   #{"src/cljs" "src/cljx" "test"}
  :dependencies '[[adzerk/boot-cljs       "0.0-2727-0" :scope "test"]
-                 [adzerk/boot-cljs-repl  "0.1.8"      :scope "test"]
+                 [adzerk/boot-cljs-repl  "0.1.9"      :scope "test"]
                  [deraen/boot-cljx       "0.2.2"      :scope "test"]
                  [adzerk/boot-reload     "0.2.4"      :scope "test"]
                  [pandeiro/boot-http     "0.6.1"      :scope "test"]
@@ -9,7 +9,7 @@
                  [org.clojure/clojure    "1.6.0"      :scope "provided"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha" :scope "provided"]
                  [org.omcljs/om          "0.8.7"]
-                 [com.joshuadavey/boot-middleman "0.0.3-SNAPSHOT" :scope "test"]])
+                 [com.joshuadavey/boot-middleman "0.0.3" :scope "test"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
