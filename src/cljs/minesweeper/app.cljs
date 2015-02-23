@@ -59,10 +59,6 @@
         (when (score/new-high-score? (:level winner) (:time winner))
           (score/save-score (:level winner) (get-name) (:time winner))))))
 
-
-(when-not (seq (get-in @app-state [:game :board]))
-  (start-game))
-
 ;; Om components
 
 (defn button-label [{:keys [revealed? flagged? bomb? count]}]
@@ -190,13 +186,15 @@
                                                        (mine/reveal-coords b (:coords space))))))))))
 
 (defn main []
+  (when-not (seq (get-in @app-state [:game :board]))
+    (start-game))
   (om/root app-view app-state
            {:target (.getElementById js/document "content")
             :tx-listen update-board-tx}))
 
 (comment
 
-(:settings @app-state)
+(start-game)
 (get-in @app-state [:settings])
 (get-in @app-state [:game :won?])
 
