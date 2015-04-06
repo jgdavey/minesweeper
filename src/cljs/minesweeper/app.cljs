@@ -68,6 +68,8 @@
 
 (defn space-view [{:keys [bomb? revealed? flagged? exploded? count] :as space} owner]
   (reify
+    om/IDisplayName
+    (display-name [_] "Space")
     om/IRender
     (render [_]
       (dom/div #js {:className (str (cond
@@ -87,19 +89,15 @@
                                  (om/update! space :revealed? true :play)))}
                (dom/span nil (button-label space))))))
 
-(defn row-view [row owner]
-  (reify
-    om/IRender
-    (render [_]
-      (apply dom/div #js {:className "row"}
-             (om/build-all space-view row)))))
-
 (defn board-view [board owner]
   (reify
+    om/IDisplayName
+    (display-name [_] "Board")
     om/IRender
     (render [_]
       (apply dom/div #js {:id "board"}
-             (om/build-all row-view board)))))
+             (map #(apply dom/div #js {:className "row"}
+                            (om/build-all space-view %)) board)))))
 
 (defn setting-field [settings name]
   (let [attr (keyword name)]
@@ -112,6 +110,8 @@
 
 (defn settings-view [settings owner]
   (reify
+    om/IDisplayName
+    (display-name [_] "Settings")
     om/IRender
     (render [_]
       (dom/form #js {:id "settings"}
@@ -129,6 +129,8 @@
 
 (defn score-view [state owner]
   (reify
+    om/IDisplayName
+    (display-name [_] "Score")
     om/IRender
     (render [_]
       (dom/div #js {:id "score"}
@@ -145,6 +147,8 @@
 
 (defn app-view [app owner]
   (reify
+    om/IDisplayName
+    (display-name [_] "App")
     om/IRender
     (render [_]
       (dom/div nil
