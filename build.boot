@@ -1,21 +1,23 @@
 (set-env!
- :source-paths   #{"src/cljs" "src/cljx" "test"}
- :dependencies '[[adzerk/boot-cljs       "0.0-2727-0" :scope "test"]
-                 [adzerk/boot-cljs-repl  "0.1.9"      :scope "test"]
-                 [deraen/boot-cljx       "0.2.2"      :scope "test"]
-                 [adzerk/boot-reload     "0.2.4"      :scope "test"]
-                 [pandeiro/boot-http     "0.6.1"      :scope "test"]
-                 [org.clojure/test.check "0.6.1"      :scope "test"]
-                 [org.clojure/clojure    "1.6.0"      :scope "provided"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha" :scope "provided"]
-                 [org.omcljs/om          "0.8.7"]
-                 [com.joshuadavey/boot-middleman "0.0.3" :scope "test"]])
+ :source-paths   #{"src/cljs" "test"}
+ :dependencies '[[org.clojure/clojure       "1.9.0-alpha14" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.293"]
+                 [adzerk/boot-cljs          "1.7.228-2"     :scope "test"]
+                 [adzerk/boot-cljs-repl     "0.3.3"]
+                 [com.cemerick/piggieback   "0.2.1"         :scope "test"]
+                 [weasel                    "0.7.0"         :scope "test"]
+                 [org.clojure/tools.nrepl   "0.2.12"        :scope "test"]
+                 [adzerk/boot-reload        "0.4.13"        :scope "test"]
+                 [pandeiro/boot-http        "0.7.3"         :scope "test"]
+                 [org.clojure/test.check    "0.9.0"         :scope "test"]
+                 [org.clojure/core.async    "0.2.395"]
+                 [org.omcljs/om             "0.8.7"]
+                 [com.joshuadavey/boot-middleman "0.0.7" :scope "test"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl repl-env]]
  '[adzerk.boot-reload    :refer [reload]]
- '[deraen.boot-cljx      :refer [cljx]]
  '[com.joshuadavey.boot-middleman :refer [middleman]]
  '[pandeiro.boot-http    :refer [serve]])
 
@@ -23,17 +25,16 @@
   (comp
     (serve :port 10555, :dir "target/")
     (watch)
-    (cljx)
     (middleman)
     (reload :on-jsload 'minesweeper.app/main)
     (cljs-repl)
-    (cljs :unified true
-          :source-map true
-          :optimizations :none)))
+    (cljs :source-map true
+          :optimizations :none)
+    (target :dir #{"target"})))
 
 (deftask package []
   (comp
-    (cljx)
     (middleman)
     (cljs :unified false
-          :optimizations :advanced)))
+          :optimizations :advanced)
+    (target :dir #{"target"})))
