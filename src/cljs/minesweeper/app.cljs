@@ -189,7 +189,7 @@
             (om/transact! root-cursor [:game :board] (fn [b]
                                                        (mine/reveal-coords b (:coords space))))))))))
 
-(defn main []
+(defn ^:export main []
   (when-not (seq (get-in @app-state [:game :board]))
     (start-game))
   (om/root app-view app-state

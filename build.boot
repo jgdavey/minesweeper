@@ -35,6 +35,5 @@
 (deftask package []
   (comp
     (middleman)
-    (cljs :unified false
-          :optimizations :advanced)
+    (cljs :optimizations :advanced)
     (target :dir #{"target"})))
