@@ -201,5 +201,6 @@
 (start-game)
 (get-in @app-state [:settings])
 (get-in @app-state [:game :won?])
+(swap! app-state assoc-in [:settings] {:bombs 20, :width 36, :height 30})
 
 )

@@ -62,10 +62,14 @@
   (apply concat board))
 
 (defn won? [board]
-  (->> board
-       spaces
-       (filter :bomb?)
-       (every? :flagged?)))
+  (let [s (spaces board)]
+    (or
+     (->> s
+          (filter :bomb?)
+          (every? :flagged?))
+     (->> s
+          (remove :bomb?)
+          (every? :revealed?)))))
 
 (defn- count-attr [board attr]
   (->> board spaces
@@ -126,6 +130,6 @@
 
 (comment
 
-(println (print-board (generate-board 5 7)))
+(println (print-board (generate-board 5 7 10)))
 
 )
