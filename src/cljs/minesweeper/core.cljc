@@ -104,23 +104,20 @@
               (assoc-in b (conj coord :revealed?) true))
             board propogated)))
 
+(defn propogate? [board path]
+  (when-let [{:keys [count]} (get-in board path)]
+    (and count (zero? count))))
+
 (defn propogated-coordinates [board coords]
-  (let [space (get-in board coords)]
-    (loop [all #{coords}
-           queue []
-           space space]
-      (if space
-        (if (and (:count space)
-                 (zero? (:count space)))
-          (let [new-neighbors (remove (comp all :path) (apply neighbors board (:path space)))
-                next-queue (vec (if (seq queue)
-                                  (concat queue new-neighbors)
-                                  new-neighbors))
-                popped (if (seq next-queue) (pop next-queue) [])
-                next-space (when (seq next-queue) (peek next-queue))]
-            (recur (into all (map :path new-neighbors)) popped next-space))
-          (recur (conj all (:path space)) (when (seq queue) (pop queue)) (peek queue)))
-        all))))
+  (loop [all #{coords}
+         [path & more] [coords]]
+    (if-not path
+      all
+      (let [neighbs (if (propogate? board path)
+                      (map :path (apply neighbors board path))
+                      [path])]
+        (recur (into all neighbs)
+               (concat more (remove all neighbs)))))))
 
 ;; Visual rep
 (def bomb-marker '*)
