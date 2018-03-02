@@ -11,15 +11,15 @@
     (is (vector? (first board)))))
 
 (deftest test-zero-propagation
-  (let [board [[{:bomb? false :count 0 :coords [0 0]} {:bomb? false :count 0 :coords [0 1]}]
-               [{:bomb? false :count 0 :coords [1 0]} {:bomb? false :count 0 :coords [1 1]}]]]
+  (let [board [[{:bomb? false :count 0 :path [0 0]} {:bomb? false :count 0 :path [0 1]}]
+               [{:bomb? false :count 0 :path [1 0]} {:bomb? false :count 0 :path [1 1]}]]]
    (is (= #{[0 0] [0 1] [1 0] [1 1]}
         (mine/propogated-coordinates board [0 0])))))
 
 (deftest test-zero-prop-large
-  (let [board [[{:bomb? false :count 0 :coords [0 0]} {:bomb? false :count 0 :coords [0 1]} {:bomb? false :count 1 :coords [0 2]}]
-               [{:bomb? false :count 0 :coords [1 0]} {:bomb? false :count 1 :coords [1 1]} {:bomb? false :count 1 :coords [1 2]}]
-               [{:bomb? false :count 1 :coords [2 0]} {:bomb? false :count 2 :coords [2 1]} {:bomb? false :count 1 :coords [2 2]}]]]
+  (let [board [[{:bomb? false :count 0 :path [0 0]} {:bomb? false :count 0 :path [0 1]} {:bomb? false :count 1 :path [0 2]}]
+               [{:bomb? false :count 0 :path [1 0]} {:bomb? false :count 1 :path [1 1]} {:bomb? false :count 1 :path [1 2]}]
+               [{:bomb? false :count 1 :path [2 0]} {:bomb? false :count 2 :path [2 1]} {:bomb? false :count 1 :path [2 2]}]]]
    (is (= #{[0 0] [0 1] [0 2] [1 0] [1 1] [1 2] [2 0] [2 1]}
         (mine/propogated-coordinates board [0 0])))))
 

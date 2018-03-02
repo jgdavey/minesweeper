@@ -187,7 +187,7 @@
                                               (assoc-in (conj space-path :exploded?) true)))))
 
             (om/transact! root-cursor [:game :board] (fn [b]
-                                                       (mine/reveal-coords b (:coords space))))))))))
+                                                       (mine/reveal-coords b (:path space))))))))))
 
 (defn ^:export main []
   (when-not (seq (get-in @app-state [:game :board]))

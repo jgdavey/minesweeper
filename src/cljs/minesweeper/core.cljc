@@ -41,7 +41,7 @@
                     {:bomb? b?
                      :revealed? false
                      :count (when-not b? (neighbor-bombs board r c))
-                     :coords [r c]}))
+                     :path [r c]}))
                 row (range))) board (range)))
 
 (defn generate-board
@@ -118,14 +118,14 @@
            space space]
       (if space
         (if (zero? (:count space))
-          (let [new-neighbors (remove (comp all :coords) (apply neighbors board (:coords space)))
+          (let [new-neighbors (remove (comp all :path) (apply neighbors board (:path space)))
                 next-queue (vec (if (seq queue)
                                   (concat queue new-neighbors)
                                   new-neighbors))
                 popped (if (seq next-queue) (pop next-queue) [])
                 next-space (when (seq next-queue) (peek next-queue))]
-            (recur (into all (map :coords new-neighbors)) popped next-space))
-          (recur (conj all (:coords space)) (when (seq queue) (pop queue)) (peek queue)))
+            (recur (into all (map :path new-neighbors)) popped next-space))
+          (recur (conj all (:path space)) (when (seq queue) (pop queue)) (peek queue)))
         all))))
 
 (comment
