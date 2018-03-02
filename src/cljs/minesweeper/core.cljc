@@ -93,20 +93,11 @@
 (defn move-count [board]
   (+ (revealed-count board) (flagged-count board)))
 
-(defn space->str [space]
-  (if (:bomb? space)
-    "*"
-    (str (:count space))))
-
 (defn reveal-all-bombs [board]
   (mapv (fn [row] (mapv (fn [s]
                           (if (or (:bomb? s) (:flagged? s))
                             (assoc s :revealed? true)
                             s)) row)) board))
-
-(defn print-board [board]
-  (str/join "\n" (map #(str/join " " (map space->str %)) board)))
-
 (defn reveal-coords [board coords]
   (let [propogated (propogated-coordinates board coords)]
     (reduce (fn [b coord]
@@ -119,7 +110,8 @@
            queue []
            space space]
       (if space
-        (if (zero? (:count space))
+        (if (and (:count space)
+                 (zero? (:count space)))
           (let [new-neighbors (remove (comp all :path) (apply neighbors board (:path space)))
                 next-queue (vec (if (seq queue)
                                   (concat queue new-neighbors)
@@ -130,8 +122,35 @@
           (recur (conj all (:path space)) (when (seq queue) (pop queue)) (peek queue)))
         all))))
 
+;; Visual rep
+(def bomb-marker '*)
+
+(defn space->str [space]
+  (if (:bomb? space)
+    bomb-marker
+    (:count space)))
+
+(defn board->summary [board]
+  (mapv #(mapv space->str %) board))
+
+(defn summary->board [summary]
+  (mapv
+   (fn [row i]
+     (mapv
+      (fn [space j]
+        (if (= bomb-marker space)
+          {:bomb? true,  :path [i j], :count nil}
+          {:bomb? false, :path [i j], :count space}))
+      row
+      (range)))
+   summary
+   (range)))
+
+(defn print-board [board]
+  (pr-str (board->summary board)))
+
 (comment
 
-(println (print-board (generate-board 7 7 10)))
+(summary->board (board->summary (generate-board 7 7 10)))
 
 )

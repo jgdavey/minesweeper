@@ -27,11 +27,29 @@
         (mine/propogated-coordinates board [0 0])))))
 
 (deftest test-zero-prop-large
-  (let [board [[{:bomb? false :count 0 :path [0 0]} {:bomb? false :count 0 :path [0 1]} {:bomb? false :count 1 :path [0 2]}]
-               [{:bomb? false :count 0 :path [1 0]} {:bomb? false :count 1 :path [1 1]} {:bomb? false :count 1 :path [1 2]}]
-               [{:bomb? false :count 1 :path [2 0]} {:bomb? false :count 2 :path [2 1]} {:bomb? false :count 1 :path [2 2]}]]]
-   (is (= #{[0 0] [0 1] [0 2] [1 0] [1 1] [1 2] [2 0] [2 1]}
-        (mine/propogated-coordinates board [0 0])))))
+  (let [summary '[[* 4 * 1 1 * 1]
+                  [* * 3 1 1 1 1]
+                  [3 * 2 1 1 1 0]
+                  [1 2 2 2 * 1 0]
+                  [1 2 * 2 1 2 1]
+                  [* 2 1 1 0 1 *]
+                  [1 1 0 0 0 1 1]]
+        board (mine/summary->board summary)]
+    (is (= (mine/propogated-coordinates board [0 0])
+           #{[0 0]}))
+    (is (= (mine/propogated-coordinates board [4 1])
+           #{[4 1]}))
+    ;; zeroes marked with commas
+    (is (= (mine/propogated-coordinates board [2 6])
+           #{[1 5] [1 6]
+             [2 5] [2,6]
+             [3 5] [3,6]
+             [4 5] [4 6]}))
+    (let [zero-spots [[5,4] [6,4] [6,3] [6,2]]])
+    (is (= (mine/propogated-coordinates board [6 3])
+           #{            [4 3] [4,4] [4 5]
+             [5 1] [5 2] [5 3] [5,4] [5 5]
+             [6 1] [6,2] [6,3] [6,4] [6 5]}))))
 
 (defspec always-ten-bombs
   50
