@@ -10,6 +10,16 @@
     (is (vector? board))
     (is (vector? (first board)))))
 
+(deftest test-neighbors
+  (let [board (mine/generate-base 5 5)]
+    (is (= (mine/neighbors board 0 0)
+           (map #(get-in board %) [ ,,,  [0 1]
+                                   [1 0] [1 1]])))
+    (is (= (mine/neighbors board 1 1)
+           (map #(get-in board %) [[0 0] [0 1] [0 2]
+                                   [1 0]  ,,,  [1 2]
+                                   [2 0] [2 1] [2 2]])))))
+
 (deftest test-zero-propagation
   (let [board [[{:bomb? false :count 0 :path [0 0]} {:bomb? false :count 0 :path [0 1]}]
                [{:bomb? false :count 0 :path [1 0]} {:bomb? false :count 0 :path [1 1]}]]]

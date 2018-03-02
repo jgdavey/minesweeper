@@ -10,12 +10,12 @@
 (declare propogated-coordinates)
 
 (defn neighbors [board i j]
-  (remove nil?
-          (for [x [-1 0 1]
-                y [-1 0 1]
-                :when (not= [x y] [0 0])
-                :let [v (get-in board [(+ i x) (+ j y)])]]
-            v)))
+  (for [x [-1 0 1]
+        y [-1 0 1]
+        :when (not= [x y] [0 0])
+        :let [v (get-in board [(+ i x) (+ j y)])]
+        :when v]
+    v))
 
 (defn neighbor-bombs [board i j]
   (->> (neighbors board i j)
