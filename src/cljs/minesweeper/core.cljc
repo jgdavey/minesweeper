@@ -9,18 +9,6 @@
 
 (declare propogated-coordinates)
 
-(def ^:private bomb? (partial = :bomb))
-
-(defn random-tuples [x y]
-  (repeatedly #(vector (rand-int x) (rand-int y))))
-
-(defn add-bombs [board c]
-  (let [w (count board)
-        h (count (first board))
-        coords (take c (distinct (random-tuples w h)))]
-    (reduce (fn [b coord]
-              (assoc-in b coord :bomb)) board coords)))
-
 (defn neighbors [board i j]
   (remove nil?
           (for [x [-1 0 1]
@@ -31,18 +19,35 @@
 
 (defn neighbor-bombs [board i j]
   (->> (neighbors board i j)
-       (filter bomb?)
+       (filter :bomb?)
        count))
 
+;; Board generation
+
+(defn random-tuples [x y]
+  (repeatedly #(vector (rand-int x) (rand-int y))))
+
+(defn add-bombs [board c]
+  (let [w (count board)
+        h (count (first board))
+        coords (take c (distinct (random-tuples w h)))]
+    (reduce (fn [b coord]
+              (assoc-in b (conj coord :bomb?) true)) board coords)))
+
 (defn annotate [board]
-  (mapv (fn [row r]
-          (mapv (fn [space c]
-                  (let [b? (bomb? space)]
-                    {:bomb? b?
-                     :revealed? false
-                     :count (when-not b? (neighbor-bombs board r c))
-                     :path [r c]}))
-                row (range))) board (range)))
+  (mapv (fn [row]
+          (mapv (fn [{:keys [bomb? path] :as space}]
+                  (assoc space
+                         :revealed? false
+                         :count (when-not bomb?
+                                  (apply neighbor-bombs board path))))
+                row))
+        board))
+
+(defn generate-base [w h]
+  (mapv (fn [x]
+          (mapv (fn [y] {:path [x y]}) (range w)))
+        (range h)))
 
 (defn generate-board
   ([]
@@ -51,15 +56,12 @@
    (let [settings (levels level)]
      (apply generate-board settings)))
   ([w h bombs]
-   (let [base (mapv (fn [x]
-                      (mapv (fn [y] nil) (range w)))
-                    (range h))]
-     (-> (add-bombs base bombs)
-         annotate))))
-
+   (-> (generate-base w h)
+       (add-bombs bombs)
+       annotate)))
 
 (defn spaces [board]
-  (apply concat board))
+  (into [] cat board))
 
 (defn won? [board]
   (let [s (spaces board)]
@@ -103,7 +105,7 @@
                             s)) row)) board))
 
 (defn print-board [board]
-  (str/join "\n" (map #(apply str (map space->str %)) board)))
+  (str/join "\n" (map #(str/join " " (map space->str %)) board)))
 
 (defn reveal-coords [board coords]
   (let [propogated (propogated-coordinates board coords)]
@@ -130,6 +132,6 @@
 
 (comment
 
-(println (print-board (generate-board 5 7 10)))
+(println (print-board (generate-board 7 7 10)))
 
 )
