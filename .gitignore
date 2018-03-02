@@ -15,3 +15,4 @@ pom.xml.asc
 /.repl
 /bin/deploy
 .nrepl-history
+/.gems/
