@@ -78,6 +78,7 @@ $score-height: 25px;
     margin-bottom: 8px;
     font-size: 12px;
     color: #666;
+    min-width: 130px;
     height: $score-height;
 
     .remaining, .moves {

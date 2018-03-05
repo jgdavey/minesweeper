@@ -73,6 +73,12 @@
           (remove :bomb?)
           (every? :revealed?)))))
 
+(defn lost? [board]
+  (let [s (spaces board)]
+    (->> s
+         (filter :bomb?)
+         (some :revealed?))))
+
 (defn- count-attr [board attr]
   (->> board spaces
        (filter attr)
@@ -98,6 +104,7 @@
                           (if (or (:bomb? s) (:flagged? s))
                             (assoc s :revealed? true)
                             s)) row)) board))
+
 (defn reveal-coords [board coords]
   (let [propogated (propogated-coordinates board coords)]
     (reduce (fn [b coord]
