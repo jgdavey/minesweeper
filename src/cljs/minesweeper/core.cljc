@@ -27,12 +27,16 @@
 (defn random-tuples [x y]
   (repeatedly #(vector (rand-int x) (rand-int y))))
 
-(defn add-bombs [board c]
-  (let [w (count board)
-        h (count (first board))
-        coords (take c (distinct (random-tuples w h)))]
-    (reduce (fn [b coord]
-              (assoc-in b (conj coord :bomb?) true)) board coords)))
+(defn add-bombs
+  ([board bomb-count first-space]
+   (let [w (count board)
+         h (count (first board))
+         coords  (->> (random-tuples w h)
+                      (remove #(= first-space %))
+                      distinct
+                      (take bomb-count))]
+     (reduce (fn [b coord]
+               (assoc-in b (conj coord :bomb?) true)) board coords))))
 
 (defn annotate [board]
   (mapv (fn [row]
@@ -56,8 +60,10 @@
    (let [settings (levels level)]
      (apply generate-board settings)))
   ([w h bombs]
+   (generate-board w h bombs [0 0]))
+  ([w h bombs first-space]
    (-> (generate-base w h)
-       (add-bombs bombs)
+       (add-bombs bombs first-space)
        annotate)))
 
 (defn spaces [board]

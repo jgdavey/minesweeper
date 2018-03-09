@@ -136,7 +136,7 @@
 (defui Score
   Object
   (render [this]
-    (let [{:keys [ui/grid game/time game/lost game/won] :as props} (om/props this)]
+    (let [{:game/keys [grid time lost won] :as props} (om/props this)]
       (html
        [:div#score
         [:span.remaining
@@ -158,7 +158,6 @@
     '[:game/settings
       :game/won
       :game/lost
-      :game/finished
       :game/time
       :game/timer
       :game/win-chan
@@ -209,22 +208,25 @@
   [{:keys [state] :as env} key params]
   {:value {:keys [:game/grid]}
    :action (fn []
-             (let [st @state
-                   [row col :as path] (:path params)
-                   space (get-in @state [:game/grid row col])]
-               (when-not (or (:game/lost st) (:game/won st))
-                 (if (:bomb? space)
-                   (do
-                     (when-let [timer (:game/timer st)]
-                       (put! timer :done))
-                     (swap! state (fn [st]
-                                    (-> st
-                                        (update-in [:game/grid] mine/reveal-all-bombs)
-                                        (assoc :game/lost true)
-                                        (assoc-in [:game/grid row col :exploded?] true)))))
-                   (swap! state checking-for-win
-                          update :game/grid
-                          mine/reveal-coords path)))))})
+             (let [[row col :as path] (:path params)
+                   {:keys [width height bombs]} (:game/settings @state)]
+               (when (zero? (mine/revealed-count (get-in @state [:game/grid])))
+                 (swap! state assoc :game/grid (generate-board width height bombs path)))
+               (let [st @state
+                     space (get-in st [:game/grid row col])]
+                 (when-not (or (:game/lost st) (:game/won st))
+                   (if (:bomb? space)
+                     (do
+                       (when-let [timer (:game/timer st)]
+                         (put! timer :done))
+                       (swap! state (fn [st]
+                                      (-> st
+                                          (update-in [:game/grid] mine/reveal-all-bombs)
+                                          (assoc :game/lost true)
+                                          (assoc-in [:game/grid row col :exploded?] true)))))
+                     (swap! state checking-for-win
+                            update :game/grid
+                            mine/reveal-coords path))))))})
 
 (defmethod mutate 'space/flag
   [{:keys [state] :as env} key params]
