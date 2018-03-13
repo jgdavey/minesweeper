@@ -48,4 +48,6 @@
   (comp
     (middleman)
     (cljs :optimizations :advanced)
+    (sift :invert true :include #{#"main.out/.*"
+                                  #"ui.html$"})
     (target :dir #{"target"})))
