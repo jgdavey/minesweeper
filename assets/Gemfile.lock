@@ -28,8 +28,8 @@ GEM
       sass (>= 3.2, < 3.5)
     erubis (2.7.0)
     execjs (2.3.0)
-    ffi (1.9.3)
-    ffi (1.9.3-java)
+    ffi (1.9.24)
+    ffi (1.9.24-java)
     haml (4.0.6)
       tilt
     hike (1.2.3)
@@ -116,5 +116,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  ffi (= 1.9.3)
+  ffi (= 1.9.24)
   middleman (~> 3.3.7)
