@@ -1,7 +1,11 @@
 @charset "utf-8";
 
+@import "normalize";
+
+/*! Minesweeper styles */
+
 body {
-  background: #fafafa url("../images/background.png");
+  background: #fafafa url("/images/background.png");
   font-family: sans-serif;
 }
 

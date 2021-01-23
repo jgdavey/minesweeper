@@ -1,4 +1,0 @@
-source 'https://rubygems.org'
-
-gem "ffi", "1.9.3"
-gem "middleman", "~> 3.3.7"
