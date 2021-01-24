@@ -178,11 +178,21 @@
    :id     :check-for-win
    :after  (fn [context]
              (let [game (get-in context [:effects :db :game])
-                   won (mine/won? (:grid game))]
+                   won (mine/won? (:grid game))
+                   lost (:lost game)]
                (cond-> context
-                 won (assoc-in [:effects :db :game :won] won)
-                 (or won (:lost game)) (update :effects assoc :interval {:action :cancel
-                                                                         :id :timer}))))))
+                 won (update-in
+                      [:effects :db :game]
+                      (fn [game]
+                        (-> game
+                            (assoc :won true)
+                            (update :grid mine/mark-matching :bomb? :flagged?)
+                            (update :grid mine/mark-matching #(not (:bomb? %)) :revealed?))))
+                 lost (update-in
+                       [:effects :db :game :grid]
+                       mine/mark-matching #(or (:bomb? %) (:flagged? %)) :revealed?)
+                 (or won lost) (update :effects
+                                       assoc :interval {:action :cancel :id :timer}))))))
 
 (rf/reg-event-db
  :space/reveal!
@@ -200,7 +210,6 @@
          (if (:bomb? space)
            (assoc db :game
                   (-> game
-                      (update :grid mine/reveal-all-bombs)
                       (assoc :lost true)
                       (assoc-in [:grid row col :exploded?] true)))
            (update-in db [:game :grid] mine/reveal-coords path)))))))

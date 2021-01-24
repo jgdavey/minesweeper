@@ -72,9 +72,8 @@
 (defn won? [board]
   (let [s (spaces board)]
     (or
-     (->> s
-          (filter :bomb?)
-          (every? :flagged?))
+     (= (into #{} (filter :flagged?) s)
+        (into #{} (filter :bomb?) s))
      (->> s
           (remove :bomb?)
           (every? :revealed?)))))
@@ -105,11 +104,12 @@
 (defn move-count [board]
   (+ (revealed-count board) (flagged-count board)))
 
-(defn reveal-all-bombs [board]
-  (mapv (fn [row] (mapv (fn [s]
-                          (if (or (:bomb? s) (:flagged? s))
-                            (assoc s :revealed? true)
-                            s)) row)) board))
+(defn mark-matching [board match-fn attr]
+  (mapv (fn [row]
+          (mapv #(cond-> %
+                   (match-fn %) (assoc attr true))
+                row))
+        board))
 
 (defn reveal-coords [board coords]
   (let [propogated (propogated-coordinates board coords)]
