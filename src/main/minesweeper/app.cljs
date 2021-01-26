@@ -123,7 +123,8 @@
                        (rf/dispatch [:game/start!]))}]])
 
 (defn app-view []
-  (let [game-sub (rf/subscribe [:game])]
+  (let [game-sub (rf/subscribe [:game])
+        show-high-scores (r/atom false)]
     (fn []
       (let [props @game-sub]
         [:div
@@ -134,8 +135,13 @@
           [board (:grid props)]]
          [:p
           [:a {:href "#"
-               :on-click (fn [e] (js/alert (high-scores)))}
-           "High Scores"]]]))))
+               :on-click (fn [e]
+                           (.preventDefault e)
+                           (swap! show-high-scores not))}
+           "High Scores"]]
+         (when @show-high-scores
+           [:p
+            (high-scores)])]))))
 
 (rf/reg-sub
  :game

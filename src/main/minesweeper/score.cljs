@@ -1,13 +1,13 @@
-(ns minesweeper.score
-  (:require [cljs.reader :refer [read-string]]))
+(ns minesweeper.score)
 
 (defn load-db []
   (if-let [s (.getItem js/localStorage "scores")]
-    (read-string s)
+    (js->clj (.parse js/JSON s) :keywordize-keys true)
     {}))
 
 (defn store-db [db]
-  (.setItem js/localStorage "scores" (pr-str db)))
+  (.setItem js/localStorage "scores"
+            (.stringify js/JSON (clj->js db))))
 
 (defn new-high-score? [skill-level time]
   (let [db (load-db)]
