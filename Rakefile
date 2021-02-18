@@ -54,10 +54,23 @@ end
 namespace :cljs do
   CLOBBER.include Dir["#{DEV_OUTPUT_DIR}/#{JS_PATH}*/*.js"]
 
+  desc "Build production release of cljs"
   task :build do
     sh "npx shadow-cljs release main"
   end
+
+  desc "Dev server for cljs"
+  task :watch do
+    sh "npx shadow-cljs watch main"
+  end
 end
+
+task :gracefully_exit do
+  trap('SIGINT') { puts "Shutting down..."; exit }
+end
+
+desc "Spin up a dev server (^C to exit)"
+multitask :dev => [:gracefully_exit, "css:watch", "cljs:watch"]
 
 class Hasher
   def initialize(paths)
@@ -106,7 +119,6 @@ namespace :dist do
 
   MANIFEST_FILE = "#{DIST_OUTPUT_DIR}/manifest.json"
 
-  desc "Build the whole thing to #{DIST_OUTPUT_DIR}, with hashed assets"
   task :assets => :build do
     Dir["#{DIST_OUTPUT_DIR}/#{JS_PATH}/**/*.*.js"].each do |old_js|
       rm old_js
@@ -155,9 +167,8 @@ namespace :dist do
   task :html => HTML_DEST
 end
 
-
-task :package => "dist:assets" do
-end
+desc "Build the whole thing to #{DIST_OUTPUT_DIR}, with hashed assets"
+task :package => "dist:assets"
 
 namespace :test do
   task :prepare do

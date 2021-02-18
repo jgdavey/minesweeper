@@ -5,7 +5,7 @@
 /*! Minesweeper styles */
 
 body {
-  background: #fafafa url("/images/background.png");
+  background: #fafafa url("../images/background.png");
   font-family: sans-serif;
 }
 
@@ -107,7 +107,7 @@ $score-height: 25px;
       margin: 2px auto 0;
       height: $score-height - 8px;
       width:  $score-height - 8px;
-      background: url("/images/sprite.png") no-repeat 0 0;
+      background: url("../images/sprite.png") no-repeat 0 0;
 
       &.lost {
         background-position: -38px 0;
@@ -140,7 +140,7 @@ $score-height: 25px;
         @extend .outset; // 2px border
       }
       &.flagged span, &.bomb span {
-        background-image: url("/images/sprite.png");
+        background-image: url("../images/sprite.png");
         background-repeat: no-repeat;
         display: block;
         height: 13px;
