@@ -41,8 +41,23 @@ $score-height: 25px;
 }
 
 #content {
+  max-width: 700px;
   text-align: center;
+  margin: 0 auto;
   overflow: hidden;
+}
+
+.player {
+  .attribute {
+    font-size: 2em;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .amount {
+    font-size: 1.6em;
+    text-align: left;
+    vertical-align: middle;
+  }
 }
 
 #settings {
@@ -119,7 +134,7 @@ $score-height: 25px;
   }
 }
 
-#board {
+.board {
   overflow: hidden;
   float: left;
   @extend .inset;
@@ -163,6 +178,42 @@ $score-height: 25px;
         border: 1px solid #bbb;
         border-width: 1px 0 0 1px;
       }
+    }
+  }
+}
+
+.deck {
+  clear: both;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  flex-flow: row nowrap;
+  padding: 10px 0;
+
+  .card {
+    width: 80px;
+    height: 100px;
+    border: 1px solid red;
+    text-align: center;
+    position: relative;
+    background-color: #fafafa;
+  }
+
+  .stack {
+    background-color: #999;
+  }
+
+  .cards {
+    position: relative;
+  }
+
+  .hand {
+    .card {
+      position: absolute;
+      left: -40px;
+      top: 0;
+      background-color: #fafafa;
+      transition: 0.4s ease-out;
     }
   }
 }
