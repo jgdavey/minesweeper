@@ -1,4 +1,4 @@
-(ns minesweeper.core
+(ns minesweeper.engine
   (:require [clojure.set :as set]
             [clojure.string :as str]))
 

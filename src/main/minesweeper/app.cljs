@@ -3,7 +3,7 @@
             [reagent.core :as r]
             [reagent.dom :as rd]
             [day8.re-frame.undo :as undo :refer [undoable]]
-            [minesweeper.core :as mine]
+            [minesweeper.engine :as mine]
             [minesweeper.score :as score])
   (:import [goog.string format]))
 
