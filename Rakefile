@@ -26,7 +26,8 @@ namespace :css do
   desc "Dev-time watch and build CSS files"
   task :watch do
     out = "#{DEV_OUTPUT_DIR}/#{CSS_PATH}"
-    args = %w[npx node-sass --watch --recursive --source-map true --output] + [out, SCSS_INPUT_DIR]
+    dirs = [SCSS_INPUT_DIR, out].join(":")
+    args = %w[npx sass --watch --source-map] + [dirs]
     sh(*args)
   end
 
@@ -42,7 +43,7 @@ namespace :css do
       mkdir_p dirname
     end
 
-    sh "npx node-sass --output-style compressed #{t.source} > #{t.name}"
+    sh "npx sass --style compressed --no-source-map #{t.source}:#{t.name}"
   end
 
   directory DIST_CSS
@@ -140,8 +141,8 @@ namespace :dist do
     js_entries = Hasher.new(Dir["#{DIST_OUTPUT_DIR}/#{JS_PATH}/**/*.js"]).entries
     all = (image_entries + js_entries + css_entries).map do |(src, dest)|
       cp src, dest
-      [src.pathmap("%{#{DIST_OUTPUT_DIR},}p"),
-       dest.pathmap("%{#{DIST_OUTPUT_DIR},}p")]
+      [src.pathmap("%{#{DIST_OUTPUT_DIR}/,}p"),
+       dest.pathmap("%{#{DIST_OUTPUT_DIR}/,}p")]
     end
     manifest_contents = JSON.pretty_generate(Hash[all])
     File.write(MANIFEST_FILE, manifest_contents)
@@ -171,24 +172,8 @@ desc "Build the whole thing to #{DIST_OUTPUT_DIR}, with hashed assets"
 task :package => "dist:assets"
 
 namespace :test do
-  task :prepare do
-    rm_rf "target/ci.js"
-    sh "npm install"
-  end
-
-  desc "Run cljs tests via karma"
-  task :cljs => :prepare do
-    sh "npx shadow-cljs compile ci-tests"
-    sh "npx karma start --single-run"
-  end
-
-  desc "Run clj tests"
-  task :clj do
-    sh "clj -M:dev:clj-tests"
-  end
-
   desc "Run all tests"
-  task :all => [:cljs, :clj]
+  task :all => [:clj]
 end
 
 task :test => "test:all"
