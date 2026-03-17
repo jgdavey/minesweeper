@@ -1,7 +1,7 @@
 (ns minesweeper.app
   (:require [re-frame.core :as rf]
             [reagent.core :as r]
-            [reagent.dom :as rd]
+            [reagent.dom.client :as rdc]
             [day8.re-frame.undo :as undo :refer [undoable]]
             [minesweeper.core :as mine]
             [minesweeper.score :as score])
@@ -254,10 +254,12 @@
  (fn [db [_ attr value]]
    (assoc-in db [:settings attr] value)))
 
+(def app-root
+  (rdc/create-root (js/document.getElementById "content")))
+
 (defn render
   []
-  (rd/render [app-view]
-             (js/document.getElementById "content")))
+  (rdc/render app-root [app-view]))
 
 (defn ^:dev/after-load clear-cache-and-render!
   []
